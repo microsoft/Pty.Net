@@ -9,7 +9,11 @@ Function Get-SymbolFiles {
 
     $ActivityName = "Collecting symbols from $Path"
     Write-Progress -Activity $ActivityName -CurrentOperation "Discovery PDB files"
-    $PDBs = Get-ChildItem -rec "$Path\*.pdb" |? { $_.FullName -notmatch "unittest|tests|\W$WindowsPdbSubDirName\W" }
+    $PDBs = & { 
+        Get-ChildItem -rec "$Path\*.pdb" |? { $_.FullName -notmatch "unittest|tests|\W$WindowsPdbSubDirName\W" };
+        Get-ChildItem -rec "$Path\..\dep\winpty\*.pdb" |? { $_.FullName -notmatch "unittest|tests|\W$WindowsPdbSubDirName\W" }
+      }
+
     Write-Progress -Activity $ActivityName -CurrentOperation "De-duplicating symbols"
     $PDBsByHash = @{}
     $i = 0
